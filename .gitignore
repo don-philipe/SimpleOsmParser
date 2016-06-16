@@ -1,0 +1,12 @@
+target/
+*~
+TODO.txt
+nbactions-*.xml
+build.xml
+maven/
+*.map
+*/nbactions.xml
+debug.sh
+*.log
+/nbactions.xml
+*.zip
