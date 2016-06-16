@@ -51,7 +51,7 @@ public class SinkImpl implements Sink
     @Override
     public void initialize(Map<String, Object> map)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+//        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     /**
@@ -97,7 +97,7 @@ public class SinkImpl implements Sink
         int i = 0;
         for(WayNode n : way.getWayNodes())
         {
-            w.addRef(n.getNodeId(), i);     // TODO: write test for checking sequence!!
+            w.addRef(n.getNodeId(), i);
             i++;
         }
         for(Tag t : way.getTags())

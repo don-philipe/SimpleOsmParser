@@ -10,3 +10,4 @@ debug.sh
 *.log
 /nbactions.xml
 *.zip
+*.swp
