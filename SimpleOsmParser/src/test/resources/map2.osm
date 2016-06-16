@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-100001' action='modify' visible='true' lat='44.50059110210594' lon='11.305621609200285' />
+  <node id='-100002' action='modify' visible='true' lat='44.51142563494207' lon='11.342365651032372'>
+    <tag k='addr:door' v='1' />
+    <tag k='entrance' v='yes' />
+  </node>
+
+</osm>
+

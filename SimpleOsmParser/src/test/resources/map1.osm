@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' upload='true' generator='JOSM'>
+  <node id='-95764' action='modify' visible='true' lat='44.50059110210594' lon='11.305621609200285' />
+  <node id='-95762' action='modify' visible='true' lat='44.506869793377085' lon='11.308675881166295' />
+  <node id='-95760' action='modify' visible='true' lat='44.51007294677033' lon='11.314335267456247' />
+  <node id='-95758' action='modify' visible='true' lat='44.509559953723446' lon='11.325609461578674'>
+    <tag k='addr:door' v='2' />
+    <tag k='entrance' v='yes' />
+  </node>
+  <node id='-95755' action='modify' visible='true' lat='44.51142563494207' lon='11.342365651032372'>
+    <tag k='addr:door' v='1' />
+    <tag k='entrance' v='yes' />
+  </node>
+  <node id='-95753' action='modify' visible='true' lat='44.51545384819686' lon='11.34523731322996' />
+  <node id='-95751' action='modify' visible='true' lat='44.5179519549776' lon='11.345416976286781' />
+  <node id='-95749' action='modify' visible='true' lat='44.52038590472631' lon='11.343171188076484' />
+  <node id='-95748' action='modify' visible='true' lat='44.5227557054698' lon='11.334098203706876' />
+  <node id='-95746' action='modify' visible='true' lat='44.51120849695334' lon='11.362005483818715' />
+  <node id='-95745' action='modify' visible='true' lat='44.50294416342664' lon='11.361825820761888' />
+  <node id='-95744' action='modify' visible='true' lat='44.50334612133271' lon='11.325474376979328' />
+  <node id='-95743' action='modify' visible='true' lat='44.51161039787401' lon='11.325654040036152' />
+  <way id='-95761' action='modify' visible='true'>
+    <nd ref='-95758' />
+    <nd ref='-95760' />
+    <nd ref='-95762' />
+    <nd ref='-95764' />
+    <tag k='highway' v='footway' />
+  </way>
+  <way id='-95750' action='modify' visible='true'>
+    <nd ref='-95748' />
+    <nd ref='-95749' />
+    <nd ref='-95751' />
+    <nd ref='-95753' />
+    <nd ref='-95755' />
+    <tag k='highway' v='footway' />
+  </way>
+  <way id='-95747' action='modify' visible='true'>
+    <nd ref='-95743' />
+    <nd ref='-95755' />
+    <nd ref='-95746' />
+    <nd ref='-95745' />
+    <nd ref='-95744' />
+    <nd ref='-95758' />
+    <nd ref='-95743' />
+    <tag k='building' v='yes' />
+  </way>
+</osm>
