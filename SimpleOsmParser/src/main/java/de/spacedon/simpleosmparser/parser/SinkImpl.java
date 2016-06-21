@@ -10,6 +10,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
+import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
@@ -112,7 +113,14 @@ public class SinkImpl implements Sink
         r.setId(relation.getId());
         r.setTimestamp(relation.getTimestamp());
         for(RelationMember m : relation.getMembers())
-            r.addMember("", String.valueOf(m.getMemberId()), m.getMemberRole());    // TODO: add proper role
+        {
+            if(m.getMemberType() == EntityType.Node)
+                r.addMember(OSMElement.NODE, m.getMemberId(), m.getMemberRole());
+            else if(m.getMemberType() == EntityType.Way)
+                r.addMember(OSMElement.WAY, m.getMemberId(), m.getMemberRole());
+            else if(m.getMemberType() == EntityType.Relation)
+                r.addMember(OSMElement.RELATION, m.getMemberId(), m.getMemberRole());
+        }
         for(Tag t : relation.getTags())
             r.setTag(t.getKey(), t.getValue());
         

@@ -127,12 +127,16 @@ public class OsmFileParser extends OsmParser
             for(OSMRelation r : this.relations.values())
             {
                 writer.writeStartElement("relation");
-                for(HashMap<String, String> mem : r.getMembers())
+                for(int i = 0; i < r.getAllMembers().size(); i++)
                 {
-                    writer.writeEmptyElement("member");
-                    writer.writeAttribute("type", mem.get("type"));
-                    writer.writeAttribute("ref", mem.get("ref"));
-                    writer.writeAttribute("role", mem.get("role"));
+                    HashMap<Long, String> element_map = r.getAllMembers().get(i);
+                    for(Long id : element_map.keySet())
+                    {
+                        writer.writeEmptyElement("member");
+                        writer.writeAttribute("type", String.valueOf(i));
+                        writer.writeAttribute("ref", String.valueOf(id));
+                        writer.writeAttribute("role", element_map.get(id));
+                    }
                 }
                 this.writeTags(writer, r);
                 writer.writeEndElement();
@@ -334,7 +338,7 @@ public class OsmFileParser extends OsmParser
                     String role = reader.getAttributeValue(null, "role");
                     if(type != null && ref != null && role != null)
                     {
-                        r.addMember(type, ref, role);
+                        r.addMember(Integer.valueOf(type), Long.valueOf(ref), role);
                         // add a reverse link (inverse to "member" attribute) to
                         // the members of this relation
                         switch (type)
