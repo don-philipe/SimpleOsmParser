@@ -46,7 +46,8 @@ public class OSMRelation extends OSMElement
     }
     
     /**
-     * 
+     * This doesnt adds the OSMElement object to this relation! Only it's ID
+     * will be used for a reference.
      * @param ele
      * @param role is optional in OSM
      */
@@ -97,17 +98,34 @@ public class OSMRelation extends OSMElement
     
     /**
      * 
-     * @param member
+     * @param memberId
      * @param elementtype either OSMElement.NODE, OSMElement.WAY OR OSMElement.RELATION
      */
-    public void delMember(long member, int elementtype)
+    public void delMember(long memberId, int elementtype)
     {
         if(elementtype == OSMElement.NODE)
-            this.node_members.remove(member);
+            this.node_members.remove(memberId);
         else if(elementtype == OSMElement.WAY)
-            this.way_members.remove(member);
+            this.way_members.remove(memberId);
         else if(elementtype == OSMElement.RELATION)
-            this.relation_members.remove(member);
+            this.relation_members.remove(memberId);
+    }
+    
+    /**
+     * 
+     * @param memberId
+     * @param elementtype
+     * @return 
+     */
+    public boolean hasMember(long memberId, int elementtype)
+    {
+        if(elementtype == OSMElement.NODE && this.node_members.containsKey(memberId))
+            return true;
+        else if(elementtype == OSMElement.WAY && this.way_members.containsKey(memberId))
+            return true;
+        else if(elementtype == OSMElement.RELATION && this.relation_members.containsKey(memberId))
+            return true;
+        return false;
     }
     
     /**
