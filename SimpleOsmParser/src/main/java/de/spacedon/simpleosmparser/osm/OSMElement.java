@@ -24,6 +24,8 @@ public abstract class OSMElement
     private ArrayList<OSMElement> belongsto = new ArrayList<>();
     private final int elementtype;
     private Date timestamp;
+    private String user;
+    private long uid;
     
     public OSMElement(int elementtype)
     {
@@ -199,5 +201,41 @@ public abstract class OSMElement
     public void setVisible(boolean visible)
     {
         this.visible = visible;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public String getUser()
+    {
+        return this.user;
+    }
+    
+    /**
+     * 
+     * @param user 
+     */
+    public void setUser(String user)
+    {
+        this.user = user;
+    }
+    
+    /**
+     * 
+     * @return the user id
+     */
+    public long getUid()
+    {
+        return this.uid;
+    }
+    
+    /**
+     * 
+     * @param uid the user id
+     */
+    public void setUid(long uid)
+    {
+        this.uid = uid;
     }
 }
