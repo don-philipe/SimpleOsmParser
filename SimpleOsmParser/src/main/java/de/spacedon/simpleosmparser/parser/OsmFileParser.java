@@ -240,7 +240,11 @@ public class OsmFileParser extends OsmParser
         if(version != null)
             n.setVersion(version);
         String visible = reader.getAttributeValue(null, "visible");
+        if(visible != null)
             n.setVisible(Boolean.valueOf(visible));
+        String user = reader.getAttributeValue(null, "user");
+        if(user != null)
+            n.setUser(user);
         
         while(true)
         {
@@ -275,6 +279,9 @@ public class OsmFileParser extends OsmParser
         String visible = reader.getAttributeValue(null, "visible");
         if(visible != null)
             w.setVisible(Boolean.valueOf(visible));
+        String user = reader.getAttributeValue(null, "user");
+        if(user != null)
+            w.setUser(user);
         
         while(true)
         {
@@ -324,6 +331,9 @@ public class OsmFileParser extends OsmParser
         String visible = reader.getAttributeValue(null, "visible");
         if(visible != null)
             r.setVisible(Boolean.valueOf(visible));
+        String user = reader.getAttributeValue(null, "user");
+        if(user != null)
+            r.setUser(user);
         
         while(true)
         {
