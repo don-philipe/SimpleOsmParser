@@ -48,10 +48,11 @@ public class OsmFileParserTest
         
         assertTrue(sop1.getNodes().size() == 1);
         
-        sop1.mergeParsers(sop2, false);
+        OsmParser sop3 = sop1.mergeParsers(sop2, false);
         
         assertTrue(sop1.getNodes().size() == 2);
         assertTrue(sop1.getNode(1).getId() == 1);
         assertTrue(sop1.getNode(2).getId() == 2);
+        assertTrue(sop3.getNode(2).getId() == 2);
     }
 }
