@@ -1,5 +1,6 @@
 package de.spacedon.simpleosmparser.parser;
 
+import de.spacedon.simpleosmparser.osm.OSMNode;
 import java.io.File;
 import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
@@ -30,5 +31,27 @@ public class OsmFileParserTest
         File f2 = new File("./src/test/resources/map2.osm");
         sop.parseOsmFile(f2);      
         assertTrue(sop.getNodes().size() == map1nodes + 2);
+    }
+    
+    @Test
+    public void testSameIdOnMerge()
+    {
+        OsmFileParser sop1 = new OsmFileParser();
+        OSMNode n1 = new OSMNode();
+        n1.setId(1);
+        sop1.putNode(n1);
+        
+        OsmFileParser sop2 = new OsmFileParser();
+        OSMNode n2 = new OSMNode();
+        n2.setId(1);
+        sop2.putNode(n2);
+        
+        assertTrue(sop1.getNodes().size() == 1);
+        
+        sop1.mergeParsers(sop2, false);
+        
+        assertTrue(sop1.getNodes().size() == 2);
+        assertTrue(sop1.getNode(1).getId() == 1);
+        assertTrue(sop1.getNode(2).getId() == 2);
     }
 }

@@ -3,6 +3,7 @@ package de.spacedon.simpleosmparser.parser;
 import de.spacedon.simpleosmparser.osm.OSMNode;
 import de.spacedon.simpleosmparser.osm.OSMRelation;
 import de.spacedon.simpleosmparser.osm.OSMWay;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -26,13 +27,44 @@ public abstract class OsmParser
     }
     
     /**
-     * 
+     * Merges two parsers (osm files) together into one. Especially takes care of IDs.
      * @param parser 
+     * @param negative_ids 
      */
-    public void mergeParsers(OsmParser parser)
+    public void mergeParsers(OsmParser parser, boolean negative_ids)
     {
+        int iddiff = 1;
+        if(negative_ids)
+            iddiff = -1;
+        
+        for(Long id : parser.getNodes().keySet()) {
+            if(this.nodes.containsKey(id)) {
+                OSMNode n = parser.getNode(id);
+                parser.getNodes().remove(id);
+                n.setId(Collections.max(this.nodes.keySet()) + iddiff);
+                parser.putNode(n);
+            }
+        }
         this.nodes.putAll(parser.getNodes());
+        
+        for(Long id : parser.getWays().keySet()) {
+            if(this.ways.containsKey(id)) {
+                OSMWay w = parser.getWay(id);
+                parser.getWays().remove(id);
+                w.setId(Collections.max(this.ways.keySet()) + iddiff);
+                parser.putWay(w);
+            }
+        }
         this.ways.putAll(parser.getWays());
+        
+        for(Long id : parser.getRelations().keySet()) {
+            if(this.relations.containsKey(id)) {
+                OSMRelation r = parser.getRelation(id);
+                parser.getRelations().remove(id);
+                r.setId(Collections.max(this.relations.keySet()) + iddiff);
+                parser.putRelation(r);
+            }
+        }
         this.relations.putAll(parser.getRelations());
     }
     
