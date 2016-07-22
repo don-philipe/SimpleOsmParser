@@ -21,7 +21,7 @@ public class OSMWay extends OSMElement
      */
     public void addRef(long ref, int sequence)
     {
-        this.getRefs().add(sequence, ref);
+        this.getRefs().add(sequence - 1, ref);
     }
     
     /**
