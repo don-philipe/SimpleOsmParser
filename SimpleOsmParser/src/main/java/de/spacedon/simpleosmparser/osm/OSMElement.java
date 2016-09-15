@@ -17,7 +17,7 @@ public abstract class OSMElement
     
     private long id;
     protected HashMap<String, String> tags;
-    private String version;
+    private int version;
     private boolean visible;
     // adds the possibility to know the way/relation this node belongs to,
     // or to know the relation this node/way/relation belongs to
@@ -38,17 +38,20 @@ public abstract class OSMElement
      * @param key must be the exact key
      * @param value can be the exact value, or a valuefragment, or even a wildcard
      * java regex characters can be used
-     * @return 
+     * @return true if the key-value combination was found, false otherwise.
      */
     public boolean hasTag(String key, String value)
     {
-	Iterator<String> iter = this.tags.keySet().iterator();
-	while(iter.hasNext())
-	{
-	    String k = iter.next();
-	    if(key.equals(k) && this.tags.get(k).matches(value))
-		return true;
-	}
+        if(key != null && value != null)
+        {
+            Iterator<String> iter = this.tags.keySet().iterator();
+            while(iter.hasNext())
+            {
+                String k = iter.next();
+                if(key.equals(k) && this.tags.get(k).matches(value))
+                    return true;
+            }
+        }
 	return false;
     }
     
@@ -104,9 +107,10 @@ public abstract class OSMElement
     }
     
     /**
-     * Gets you a value specified by the key.
+     * Gets you a value specified by the key. Or null if no value is linked to
+     * that key.
      * @param key
-     * @return 
+     * @return the value or null if no mapping for that key
      */
     public String getTag(String key)
     {
@@ -155,7 +159,7 @@ public abstract class OSMElement
      * 
      * @return 
      */
-    public String getVersion()
+    public int getVersion()
     {
         return this.version;
     }
@@ -164,7 +168,7 @@ public abstract class OSMElement
      * 
      * @param version 
      */
-    public void setVersion(String version)
+    public void setVersion(int version)
     {
         this.version = version;
     }

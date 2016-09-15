@@ -14,9 +14,9 @@ import java.util.LinkedList;
  */
 public abstract class OsmParser
 {
-    protected final HashMap<Long, OSMNode> nodes;
-    protected final HashMap<Long, OSMWay> ways;
-    protected final HashMap<Long, OSMRelation> relations;
+    protected HashMap<Long, OSMNode> nodes;
+    protected HashMap<Long, OSMWay> ways;
+    protected HashMap<Long, OSMRelation> relations;
     
     /**
      * 
@@ -125,6 +125,33 @@ public abstract class OsmParser
         this.relations.putAll(parser.getRelations());
         
         return parser;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public OsmParser getParser()
+    {
+        return this;
+    }
+    
+    /**
+     * Removes all nodes, ways and relations from this parser and copies those
+     * from overhanded parser to this one.
+     * @param parser 
+     */
+    public void setParser(OsmParser parser)
+    {
+        this.nodes = new HashMap<>();
+        for(OSMNode n : parser.getNodes().values())
+            this.putNode(n);
+        this.ways = new HashMap<>();
+        for(OSMWay w : parser.getWays().values())
+            this.putWay(w);
+        this.relations = new HashMap<>();
+        for(OSMRelation r : parser.getRelations().values())
+            this.putRelation(r);
     }
     
     /**

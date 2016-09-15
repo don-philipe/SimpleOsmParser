@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 /**
- *
+ * Reads and writes *.osm files (XML format).
  * @author Philipp Thöricht
  */
 public class OsmFileParser extends OsmParser
@@ -103,7 +103,11 @@ public class OsmFileParser extends OsmParser
             {
                 writer.writeStartElement("node");
                 writer.writeAttribute("id", String.valueOf(n.getId()));
-                writer.writeAttribute("timestamp", timestamp);
+                if(n.getTimestamp() != null)
+                    writer.writeAttribute("timestamp", sdf.format(n.getTimestamp()));
+                else
+                    writer.writeAttribute("timestamp", timestamp);
+                writer.writeAttribute("version", String.valueOf(n.getVersion()));
                 writer.writeAttribute("lat", String.valueOf(n.getLat()));
                 writer.writeAttribute("lon", String.valueOf(n.getLon()));
                 this.writeTags(writer, n);
@@ -114,7 +118,11 @@ public class OsmFileParser extends OsmParser
             {
                 writer.writeStartElement("way");
                 writer.writeAttribute("id", String.valueOf(w.getId()));
-                writer.writeAttribute("timestamp", timestamp);
+                if(w.getTimestamp() != null)
+                    writer.writeAttribute("timestamp", sdf.format(w.getTimestamp()));
+                else
+                    writer.writeAttribute("timestamp", timestamp);
+                writer.writeAttribute("version", String.valueOf(w.getVersion()));
                 for(long nid : w.getRefs())
                 {
                     writer.writeEmptyElement("nd");
@@ -127,13 +135,30 @@ public class OsmFileParser extends OsmParser
             for(OSMRelation r : this.relations.values())
             {
                 writer.writeStartElement("relation");
+                writer.writeAttribute("id", String.valueOf(r.getId()));
+                if(r.getTimestamp() != null)
+                    writer.writeAttribute("timestamp", sdf.format(r.getTimestamp()));
+                else
+                    writer.writeAttribute("timestamp", timestamp);
+                writer.writeAttribute("version", String.valueOf(r.getVersion()));
                 for(int i = 0; i < r.getAllMembers().size(); i++)
                 {
                     HashMap<Long, String> element_map = r.getAllMembers().get(i);
                     for(Long id : element_map.keySet())
                     {
                         writer.writeEmptyElement("member");
-                        writer.writeAttribute("type", String.valueOf(i));
+                        switch(i)
+                        {
+                            case 0:
+                                writer.writeAttribute("type", "node");
+                                break;
+                            case 1:
+                                writer.writeAttribute("type", "way");
+                                break;
+                            case 2:
+                                writer.writeAttribute("type", "relation");
+                                break;
+                        }
                         writer.writeAttribute("ref", String.valueOf(id));
                         writer.writeAttribute("role", element_map.get(id));
                     }
@@ -238,7 +263,7 @@ public class OsmFileParser extends OsmParser
             n.setId(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
         if(version != null)
-            n.setVersion(version);
+            n.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
         if(visible != null)
             n.setVisible(Boolean.valueOf(visible));
@@ -275,7 +300,7 @@ public class OsmFileParser extends OsmParser
             w.setId(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
         if(version != null)
-            w.setVersion(version);
+            w.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
         if(visible != null)
             w.setVisible(Boolean.valueOf(visible));
@@ -327,7 +352,7 @@ public class OsmFileParser extends OsmParser
             r.setId(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
         if(version != null)
-            r.setVersion(version);
+            r.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
         if(visible != null)
             r.setVisible(Boolean.valueOf(visible));

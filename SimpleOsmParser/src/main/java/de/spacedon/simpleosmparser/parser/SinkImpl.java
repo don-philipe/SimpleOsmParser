@@ -84,6 +84,7 @@ public class SinkImpl implements Sink
         n.setLat(node.getLatitude());
         n.setLon(node.getLongitude());
         n.setTimestamp(node.getTimestamp());
+        n.setVersion(node.getVersion());
         for(Tag t : node.getTags())
             n.setTag(t.getKey(), t.getValue());
         
@@ -95,7 +96,8 @@ public class SinkImpl implements Sink
         OSMWay w = new OSMWay();
         w.setId(way.getId());
         w.setTimestamp(way.getTimestamp());
-        int i = 0;
+        w.setVersion(way.getVersion());
+        int i = 1;
         for(WayNode n : way.getWayNodes())
         {
             w.addRef(n.getNodeId(), i);
@@ -112,6 +114,7 @@ public class SinkImpl implements Sink
         OSMRelation r = new OSMRelation();
         r.setId(relation.getId());
         r.setTimestamp(relation.getTimestamp());
+        r.setVersion(relation.getVersion());
         for(RelationMember m : relation.getMembers())
         {
             if(m.getMemberType() == EntityType.Node)
