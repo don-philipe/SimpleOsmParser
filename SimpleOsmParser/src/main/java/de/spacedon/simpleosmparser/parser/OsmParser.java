@@ -31,7 +31,7 @@ public abstract class OsmParser
     /**
      * Merges two parsers (osm files) together into one. Especially takes care of IDs.
      * @param parser 
-     * @param negative_ids 
+     * @param negative_ids allow negative IDs?
      * @return the parser that was overhanded to this method, because its IDs might have changed.
      */
     public OsmParser mergeParsers(OsmParser parser, boolean negative_ids)
@@ -128,6 +128,35 @@ public abstract class OsmParser
     }
     
     /**
+     * Compares two ways based on their coordinates and the sequence of the 
+     * coordinates.
+     * @param w1_id
+     * @param w2_id
+     * @return false if number of nodes in the two ways are different or if 
+     * two nodes at the same index are different based on their coordinates.
+     */
+    public boolean samePathway(long w1_id, long w2_id)
+    {
+        if(this.ways.get(w1_id).getRefs().size() != this.ways.get(w2_id).getRefs().size())
+            return false;
+        ArrayList<Double> latlist = new ArrayList<>();
+        ArrayList<Double> lonlist = new ArrayList<>();
+        for(Long n1_id : this.ways.get(w1_id).getRefs())
+        {
+            latlist.add(this.nodes.get(n1_id).getLat());
+            lonlist.add(this.nodes.get(n1_id).getLon());
+        }
+        for(Long n2_id : this.ways.get(w2_id).getRefs())
+        {
+            int index = this.ways.get(w2_id).getRefs().indexOf(n2_id);
+            if(latlist.get(index) != this.nodes.get(n2_id).getLat()
+                    || lonlist.get(index) != this.nodes.get(n2_id).getLon())
+                return false;
+        }
+        return true;
+    }
+    
+    /**
      * 
      * @return 
      */
@@ -173,7 +202,7 @@ public abstract class OsmParser
     }
     
     /**
-     * 
+     * A node with the same ID in the parser will be overwritten.
      * @param node 
      */
     public void putNode(OSMNode node)
