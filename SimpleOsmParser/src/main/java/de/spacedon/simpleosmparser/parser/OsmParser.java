@@ -128,6 +128,23 @@ public abstract class OsmParser
     }
     
     /**
+     * 
+     * @param lat
+     * @param lon
+     * @return the ID of the node with the same coordinates or just 0 if no node
+     * was found.
+     */
+    public long sameNode(double lat, double lon)
+    {
+       for(OSMNode node : this.nodes.values())
+       {
+           if(node.getLat() == lat && node.getLon() == lon)
+               return node.getId();
+       }
+       return 0;
+    }
+    
+    /**
      * Compares two ways based on their coordinates and the sequence of the 
      * coordinates.
      * @param w1_id
