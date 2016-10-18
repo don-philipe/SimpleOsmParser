@@ -131,14 +131,33 @@ public abstract class OsmParser
      * 
      * @param lat
      * @param lon
-     * @return the ID of the node with the same coordinates or just 0 if no node
-     * was found.
+     * @return the ID of the first node with the same coordinates or just 0 if 
+     * no node was found.
      */
     public long sameNode(double lat, double lon)
     {
        for(OSMNode node : this.nodes.values())
        {
            if(node.getLat() == lat && node.getLon() == lon)
+               return node.getId();
+       }
+       return 0;
+    }
+    
+    /**
+     * Find node at the same position within a given tolerance area.
+     * @param lat
+     * @param lon
+     * @param tolerance
+     * @return the ID of the first node which is within the area or 0 if none
+     * is found.
+     */
+    public long sameNode(double lat, double lon, double tolerance)
+    {
+       for(OSMNode node : this.nodes.values())
+       {
+           if(lat - tolerance < node.getLat() && node.getLat() < lat + tolerance
+                   && lon - tolerance < node.getLon() && node.getLon() < lon + tolerance)
                return node.getId();
        }
        return 0;
