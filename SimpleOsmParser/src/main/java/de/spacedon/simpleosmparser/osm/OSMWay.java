@@ -17,10 +17,12 @@ public class OSMWay extends OSMElement
     /**
      * 
      * @param ref
-     * @param sequence 
+     * @param sequence 1-based, values small than 1 will be set to 1.
      */
     public void addRef(long ref, int sequence)
     {
+		if(sequence < 1)
+			sequence = 1;
         this.getRefs().add(sequence - 1, ref);
     }
     
