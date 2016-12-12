@@ -299,4 +299,12 @@ public abstract class OsmParser
     {
         this.relations.put(relation.getId(), relation);
     }
+	
+	/**
+	 * Parser is empty if it contains neither nodes nor ways nor relations.
+	 * @return 
+	 */
+	public boolean isEmpty() {
+		return this.nodes.isEmpty() && this.ways.isEmpty() && this.relations.isEmpty();
+	}
 }

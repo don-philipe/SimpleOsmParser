@@ -172,11 +172,15 @@ public class OsmFileParser extends OsmParser
             
             writer.flush();
             writer.close();
+			out.close();
         }
         catch (FileNotFoundException ex)
         {
             Logger.getLogger(SimpleOsmParser.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (IOException ex)
+		{
+			Logger.getLogger(OsmFileParser.class.getName()).log(Level.SEVERE, null, ex);
+		}
     }
     
     /**
