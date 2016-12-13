@@ -29,7 +29,7 @@ public abstract class OsmParser
     }
     
     /**
-     * Merges two parsers (osm files) together into one. Especially takes care of IDs.
+     * Merges the overhandes parser (osm files) into this. Especially takes care of IDs.
      * @param parser 
      * @param negative_ids allow negative IDs?
      * @return the parser that was overhanded to this method, because its IDs might have changed.
@@ -38,6 +38,12 @@ public abstract class OsmParser
     {        
         ArrayList<Long> remove_nodes = new ArrayList<>();
         ArrayList<OSMNode> new_nodes = new ArrayList<>();
+		long min_id = 0L;
+		long max_id = 0L;
+		if(!this.nodes.isEmpty()) {
+			min_id = Collections.min(this.nodes.keySet());
+			max_id = Collections.max(this.nodes.keySet());
+		}
         for(Long id : parser.getNodes().keySet())
         {
             if(this.nodes.containsKey(id))
@@ -45,9 +51,9 @@ public abstract class OsmParser
                 OSMNode n = parser.getNode(id);
                 remove_nodes.add(id);
                 if(negative_ids)
-                    n.setId(Collections.min(this.nodes.keySet()) - 1);
+                    n.setId(--min_id);
                 else
-                    n.setId(Collections.max(this.nodes.keySet()) + 1);
+                    n.setId(++max_id);
                 new_nodes.add(n);
             }
         }
@@ -83,6 +89,12 @@ public abstract class OsmParser
         
         ArrayList<Long> remove_ways = new ArrayList<>();
         ArrayList<OSMWay> new_ways = new ArrayList<>();
+		min_id = 0L;
+		max_id = 0L;
+		if(!this.ways.isEmpty()) {
+			min_id = Collections.min(this.ways.keySet());
+			max_id = Collections.max(this.ways.keySet());
+		}
         for(Long id : parser.getWays().keySet())
         {
             if(this.ways.containsKey(id))
@@ -90,9 +102,9 @@ public abstract class OsmParser
                 OSMWay w = parser.getWay(id);
                 remove_ways.add(id);
                 if(negative_ids)
-                    w.setId(Collections.min(this.ways.keySet()) - 1);
+                    w.setId(--min_id);
                 else
-                    w.setId(Collections.max(this.ways.keySet()) + 1);
+                    w.setId(++max_id);
                 new_ways.add(w);
             }
         }
@@ -105,6 +117,12 @@ public abstract class OsmParser
         
         LinkedList<Long> remove_relations = new LinkedList<>();
         LinkedList<OSMRelation> new_relations = new LinkedList<>();
+		min_id = 0L;
+		max_id = 0L;
+		if(!this.relations.isEmpty()) {
+			min_id = Collections.min(this.relations.keySet());
+			max_id = Collections.max(this.relations.keySet());
+		}
         for(Long id : parser.getRelations().keySet())
         {
             if(this.relations.containsKey(id))
@@ -112,9 +130,9 @@ public abstract class OsmParser
                 OSMRelation r = parser.getRelation(id);
                 remove_relations.add(id);
                 if(negative_ids)
-                    r.setId(Collections.min(this.relations.keySet()) - 1);
+                    r.setId(--min_id);
                 else
-                    r.setId(Collections.max(this.relations.keySet()) + 1);
+                    r.setId(++max_id);
                 new_relations.add(r);
             }
         }
