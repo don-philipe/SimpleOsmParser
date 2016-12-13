@@ -40,7 +40,8 @@ public abstract class OsmParser
         ArrayList<OSMNode> new_nodes = new ArrayList<>();
 		long min_id = 0L;
 		long max_id = 0L;
-		if(!this.nodes.isEmpty()) {
+		if(!this.nodes.isEmpty())
+		{
 			min_id = Collections.min(this.nodes.keySet());
 			max_id = Collections.max(this.nodes.keySet());
 		}
@@ -67,11 +68,14 @@ public abstract class OsmParser
         LinkedList<OSMWay> modify_ways = new LinkedList<>();
         for(OSMWay w : parser.getWays().values())
         {
+			boolean modify = false;
             for(Long id : remove_nodes)
             {
                 if(w.getRefs().contains(id))
-                    modify_ways.add(w);
+                    modify = true;
             }
+			if(modify)
+				modify_ways.add(w);		// dont do this in the inner loop
         }
         for(OSMWay w : modify_ways)
         {
@@ -81,7 +85,7 @@ public abstract class OsmParser
                 if(w.getRefs().contains(old_id))
                 {
                     int pos = parser.getWay(w.getId()).getRefs().indexOf(old_id);
-                    parser.getWay(w.getId()).addRef(new_nodes.get(i).getId(), pos);
+                    parser.getWay(w.getId()).replaceRef(new_nodes.get(i).getId(), pos);
                 }
             }
         }
@@ -91,7 +95,8 @@ public abstract class OsmParser
         ArrayList<OSMWay> new_ways = new ArrayList<>();
 		min_id = 0L;
 		max_id = 0L;
-		if(!this.ways.isEmpty()) {
+		if(!this.ways.isEmpty())
+		{
 			min_id = Collections.min(this.ways.keySet());
 			max_id = Collections.max(this.ways.keySet());
 		}
@@ -119,7 +124,8 @@ public abstract class OsmParser
         LinkedList<OSMRelation> new_relations = new LinkedList<>();
 		min_id = 0L;
 		max_id = 0L;
-		if(!this.relations.isEmpty()) {
+		if(!this.relations.isEmpty())
+		{
 			min_id = Collections.min(this.relations.keySet());
 			max_id = Collections.max(this.relations.keySet());
 		}

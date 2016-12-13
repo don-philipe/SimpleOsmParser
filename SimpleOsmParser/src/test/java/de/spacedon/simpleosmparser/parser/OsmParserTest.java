@@ -2,6 +2,8 @@ package de.spacedon.simpleosmparser.parser;
 
 import de.spacedon.simpleosmparser.osm.OSMNode;
 import de.spacedon.simpleosmparser.osm.OSMWay;
+import java.util.ArrayList;
+import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -60,7 +62,7 @@ public class OsmParserTest
     }
 	
 	@Test
-	public void testMergeParsers()
+	public void testMergeNodes()
 	{
 		OsmTestParser otp1 = new OsmTestParser();
 		OSMNode n = new OSMNode();
@@ -129,6 +131,52 @@ public class OsmParserTest
 		assertTrue(otp1.getNodes().containsKey(1340L));
 		tag = otp1.getNodes().get(1340L).getTag("node");
 		assertTrue("456".contains(tag));
+	}
+	
+	@Test
+	public void mergeWays() {
+		OsmTestParser otp1 = new OsmTestParser();
+		OSMNode n = new OSMNode();
+		n.setId(23L);
+		n.setTag("node", "1");
+		otp1.nodes.put(n.getId(), n);
+		n = new OSMNode();
+		n.setId(42L);
+		n.setTag("node", "2");
+		otp1.nodes.put(n.getId(), n);
+		OSMWay w = new OSMWay();
+		w.setId(1337L);
+		w.addRefToEnd(23L);
+		w.addRefToEnd(42L);
+		otp1.ways.put(w.getId(), w);
+		
+		OsmTestParser otp2 = new OsmTestParser();
+		n = new OSMNode();
+		n.setId(23L);
+		n.setTag("node", "3");
+		otp2.nodes.put(n.getId(), n);
+		n = new OSMNode();
+		n.setId(42L);
+		n.setTag("node", "4");
+		otp2.nodes.put(n.getId(), n);
+		w = new OSMWay();
+		w.setId(1337L);
+		w.addRefToEnd(23L);
+		w.addRefToEnd(42L);
+		otp2.ways.put(w.getId(), w);
+		
+		otp1.mergeParsers(otp2, false);
+		
+		assertEquals(4, otp1.getNodes().size());
+		assertEquals(2, otp1.getWays().size());
+		ArrayList<Long> refs = new ArrayList<>();
+		refs.add(23L);
+		refs.add(42L);
+		assertTrue(otp1.getWays().get(1337L).getRefs().containsAll(refs));
+		refs = new ArrayList<>();
+		refs.add(43L);
+		refs.add(44L);
+		assertTrue(otp1.getWays().get(1338L).getRefs().containsAll(refs));
 	}
 	
 	private class OsmTestParser extends OsmParser

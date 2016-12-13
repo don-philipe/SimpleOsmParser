@@ -77,4 +77,10 @@ public class OSMWay extends OSMElement
     {
         return this.getRefs().remove(sequence);
     }
+	
+	public void replaceRef(long ref, int sequence)
+	{
+		this.delRef(sequence);
+		this.addRef(ref, sequence);
+	}
 }
