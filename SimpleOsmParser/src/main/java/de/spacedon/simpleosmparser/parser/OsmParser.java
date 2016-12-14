@@ -66,28 +66,16 @@ public abstract class OsmParser
         this.nodes.putAll(parser.getNodes());
         
         // refresh refs in all ways:
-        LinkedList<OSMWay> modify_ways = new LinkedList<>();
         for(OSMWay w : parser.getWays().values())
-        {
-			boolean modify = false;
-            for(Long id : remove_nodes)
-            {
-                if(w.getRefs().contains(id))
-                    modify = true;
-            }
-			if(modify)
-				modify_ways.add(w);		// dont do this in the inner loop
-        }
-        for(OSMWay w : modify_ways)
         {
             for(int i = 0; i < remove_nodes.size(); i++)
             {
-                long old_id = remove_nodes.get(i);
+				long old_id = remove_nodes.get(i);
                 if(w.getRefs().contains(old_id))
-                {
-                    int pos = parser.getWay(w.getId()).getRefs().indexOf(old_id);
-                    parser.getWay(w.getId()).replaceRef(new_nodes.get(i).getId(), pos);
-                }
+				{
+                    int pos = w.getRefs().indexOf(old_id);
+					w.replaceRef(new_nodes.get(i).getId(), pos);
+				}
             }
         }
         //TODO refresh refs in all relations
