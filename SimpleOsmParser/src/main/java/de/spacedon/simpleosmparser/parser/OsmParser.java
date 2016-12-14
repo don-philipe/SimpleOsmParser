@@ -1,5 +1,6 @@
 package de.spacedon.simpleosmparser.parser;
 
+import de.spacedon.simpleosmparser.osm.OSMElement;
 import de.spacedon.simpleosmparser.osm.OSMNode;
 import de.spacedon.simpleosmparser.osm.OSMRelation;
 import de.spacedon.simpleosmparser.osm.OSMWay;
@@ -269,6 +270,37 @@ public abstract class OsmParser
     {
         this.nodes.put(node.getId(), node);
     }
+	
+	/**
+	 * Replaces node with old_id with the given new node. Takes care of refs in
+	 * ways and members in relations.
+	 * @param old_id
+	 * @param node 
+	 */
+	public void replaceNode(long old_id, OSMNode node)
+	{
+		this.nodes.remove(old_id);
+		this.nodes.put(node.getId(), node);
+		
+		for(OSMWay w : this.ways.values())
+		{
+			if(w.getRefs().contains(old_id))
+			{
+				w.replaceRef(old_id, node.getId());
+			}
+		}
+		
+		for(OSMRelation r : this.relations.values())
+		{
+			for(Long n_id : r.getAllMembers().get(0).keySet())
+			{
+				if(n_id.equals(old_id))
+				{
+					r.replaceMember(old_id, node.getId(), OSMElement.NODE);
+				}
+			}
+		}
+	}
 
     /**
      * @return the ways
@@ -328,7 +360,8 @@ public abstract class OsmParser
 	 * Parser is empty if it contains neither nodes nor ways nor relations.
 	 * @return 
 	 */
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		return this.nodes.isEmpty() && this.ways.isEmpty() && this.relations.isEmpty();
 	}
 }

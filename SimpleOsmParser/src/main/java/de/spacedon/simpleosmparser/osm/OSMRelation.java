@@ -127,6 +127,27 @@ public class OSMRelation extends OSMElement
             return true;
         return false;
     }
+	
+	/**
+	 * 
+	 * @param old_id
+	 * @param new_id
+	 * @param elementtype 
+	 * @throws NoSuchFieldError if no old_id with given elementtype exists
+	 */
+	public void replaceMember(long old_id, long new_id, int elementtype) throws NoSuchFieldError
+	{
+		if(this.hasMember(old_id, elementtype))
+		{
+			String old_role = this.getMembersByElementType(OSMElement.NODE).get(old_id);
+			this.delMember(old_id, elementtype);
+			this.addMember(elementtype, new_id, old_role);
+		}
+		else
+		{
+			throw new NoSuchFieldError();
+		}
+	}
     
     /**
      * 
