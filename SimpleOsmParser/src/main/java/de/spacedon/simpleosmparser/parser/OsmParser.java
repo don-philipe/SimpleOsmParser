@@ -41,7 +41,7 @@ public abstract class OsmParser
         ArrayList<OSMNode> new_nodes = new ArrayList<>();
 		long min_id = 0L;
 		long max_id = 0L;
-		if(!this.nodes.isEmpty())
+		if(!this.nodes.isEmpty() && !parser.nodes.isEmpty())
 		{
 			min_id = Math.min(Collections.min(this.nodes.keySet()), Collections.min(parser.nodes.keySet()));
 			max_id = Math.max(Collections.max(this.nodes.keySet()), Collections.max(parser.nodes.keySet()));
@@ -84,7 +84,7 @@ public abstract class OsmParser
         ArrayList<OSMWay> new_ways = new ArrayList<>();
 		min_id = 0L;
 		max_id = 0L;
-		if(!this.ways.isEmpty())
+		if(!this.ways.isEmpty() && !parser.ways.isEmpty())
 		{
 			min_id = Math.min(Collections.min(this.ways.keySet()), Collections.min(parser.ways.keySet()));
 			max_id = Math.max(Collections.max(this.ways.keySet()), Collections.max(parser.ways.keySet()));
@@ -113,7 +113,7 @@ public abstract class OsmParser
         LinkedList<OSMRelation> new_relations = new LinkedList<>();
 		min_id = 0L;
 		max_id = 0L;
-		if(!this.relations.isEmpty())
+		if(!this.relations.isEmpty() && !parser.relations.isEmpty())
 		{
 			min_id = Math.min(Collections.min(this.relations.keySet()), Collections.min(parser.relations.keySet()));
 			max_id = Math.max(Collections.max(this.relations.keySet()), Collections.max(parser.relations.keySet()));
