@@ -181,6 +181,61 @@ public class OsmParserTest
 	}
 	
 	@Test
+	public void testMergeParsers()
+	{
+		OsmTestParser otp1 = new OsmTestParser();
+		OsmTestParser otp2 = new OsmTestParser();
+		OSMNode n11 = new OSMNode();
+		n11.setId(-1);
+		n11.setLat(1.0);
+		n11.setLon(1.0);
+		OSMNode n12 = new OSMNode();
+		n12.setId(-2);
+		n12.setLat(2.0);
+		n12.setLon(2.0);
+		n12.setTag("entrance", "yes");
+		OSMNode n21 = new OSMNode();
+		n21.setId(-3);
+		n21.setLat(2.0);
+		n21.setLon(2.0);
+		n21.setTag("entrance", "yes");
+		OSMNode n22 = new OSMNode();
+		n22.setId(-1);
+		n22.setLat(3.0);
+		n22.setLon(3.0);
+		n22.setTag("node", "4");
+		OSMWay w1 = new OSMWay();
+		w1.setId(-1);
+		w1.addRefToEnd(-1);
+		w1.addRefToEnd(-2);
+		OSMWay w2 = new OSMWay();
+		w2.setId(-2);
+		w2.addRefToEnd(-3);
+		w2.addRefToEnd(-1);
+		otp1.nodes.put(n11.getId(), n11);
+		otp1.nodes.put(n12.getId(), n12);
+		otp2.nodes.put(n21.getId(), n21);
+		otp2.nodes.put(n22.getId(), n22);
+		otp1.ways.put(w1.getId(), w1);
+		otp2.ways.put(w2.getId(), w2);
+
+		OsmParser otp3 = otp1.mergeParsers(otp2, true);
+		assertEquals(2, otp3.nodes.size());
+		assertTrue(otp3.nodes.containsKey(-3L));
+		assertTrue(otp3.nodes.get(-3L).hasTag("entrance", "yes"));
+		assertTrue(otp3.nodes.containsKey(-4L));
+		assertTrue(otp3.nodes.get(-4L).hasTag("node", "4"));
+		assertEquals(1, otp3.ways.size());
+		
+		assertEquals(4, otp1.nodes.size());
+		assertEquals(2, otp1.ways.size());
+		assertTrue(otp1.ways.get(-1L).getRefs().contains(-1L));
+		assertTrue(otp1.ways.get(-1L).getRefs().contains(-2L));
+		assertTrue(otp1.ways.get(-2L).getRefs().contains(-3L));
+		assertTrue(otp1.ways.get(-2L).getRefs().contains(-4L));
+	}
+	
+	@Test
 	public void testReplaceNode()
 	{
 		OsmTestParser otp = new OsmTestParser();

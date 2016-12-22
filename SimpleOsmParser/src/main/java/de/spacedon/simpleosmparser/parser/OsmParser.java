@@ -43,8 +43,8 @@ public abstract class OsmParser
 		long max_id = 0L;
 		if(!this.nodes.isEmpty())
 		{
-			min_id = Collections.min(this.nodes.keySet());
-			max_id = Collections.max(this.nodes.keySet());
+			min_id = Math.min(Collections.min(this.nodes.keySet()), Collections.min(parser.nodes.keySet()));
+			max_id = Math.max(Collections.max(this.nodes.keySet()), Collections.max(parser.nodes.keySet()));
 		}
         for(Long id : parser.getNodes().keySet())
         {
@@ -86,8 +86,8 @@ public abstract class OsmParser
 		max_id = 0L;
 		if(!this.ways.isEmpty())
 		{
-			min_id = Collections.min(this.ways.keySet());
-			max_id = Collections.max(this.ways.keySet());
+			min_id = Math.min(Collections.min(this.ways.keySet()), Collections.min(parser.ways.keySet()));
+			max_id = Math.max(Collections.max(this.ways.keySet()), Collections.max(parser.ways.keySet()));
 		}
         for(Long id : parser.getWays().keySet())
         {
@@ -115,8 +115,8 @@ public abstract class OsmParser
 		max_id = 0L;
 		if(!this.relations.isEmpty())
 		{
-			min_id = Collections.min(this.relations.keySet());
-			max_id = Collections.max(this.relations.keySet());
+			min_id = Math.min(Collections.min(this.relations.keySet()), Collections.min(parser.relations.keySet()));
+			max_id = Math.max(Collections.max(this.relations.keySet()), Collections.max(parser.relations.keySet()));
 		}
         for(Long id : parser.getRelations().keySet())
         {

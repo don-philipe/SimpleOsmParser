@@ -377,19 +377,24 @@ public class OsmFileParser extends OsmParser
                     String role = reader.getAttributeValue(null, "role");
                     if(type != null && ref != null && role != null)
                     {
-                        r.addMember(Integer.valueOf(type), Long.valueOf(ref), role);
                         // add a reverse link (inverse to "member" attribute) to
                         // the members of this relation
                         switch (type)
                         {
                             case "node":
-                                this.nodes.get(Long.valueOf(ref)).addBelongsTo(r);
+								r.addMember(OSMElement.NODE, Long.valueOf(ref), role);
+								if(Long.valueOf(ref) != null && this.nodes.containsKey(Long.valueOf(ref)))
+									this.nodes.get(Long.valueOf(ref)).addBelongsTo(r);
                                 break;
                             case "way":
-                                this.ways.get(Long.valueOf(ref)).addBelongsTo(r);
+								r.addMember(OSMElement.WAY, Long.valueOf(ref), role);
+								if(Long.valueOf(ref) != null && this.ways.containsKey(Long.valueOf(ref)))
+									this.ways.get(Long.valueOf(ref)).addBelongsTo(r);
                                 break;
                             case "relation":
-                                this.relations.get(Long.valueOf(ref)).addBelongsTo(r);
+								r.addMember(OSMElement.RELATION, Long.valueOf(ref), role);
+								if(Long.valueOf(ref) != null && this.relations.containsKey(Long.valueOf(ref)))
+									this.relations.get(Long.valueOf(ref)).addBelongsTo(r);
                                 break;
                             default:
                                 break;
