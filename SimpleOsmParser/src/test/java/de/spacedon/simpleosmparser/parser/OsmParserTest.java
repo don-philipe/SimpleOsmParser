@@ -14,33 +14,35 @@ import org.junit.Test;
  */
 public class OsmParserTest
 {
+	
+	@Test
+	public void testSameNode()
+	{
+		OsmParser op = new OsmFileParser();
+		OSMNode n1 = new OSMNode(1, 1.0, 1.0);
+		op.putNode(n1);
+		OSMNode n2 = new OSMNode(2, 1.0, 1.0);
+		op.putNode(n2);
+		
+		assertEquals(1, op.sameNode(n2.getLat(), n2.getLon(), 0));
+	}
+	
     @Test
     public void testSamePathway()
     {
         OsmParser op = new OsmFileParser();
-        OSMNode n1 = new OSMNode();
-        n1.setId(1);
-        n1.setLat(1.1);
-        n1.setLon(2.2);
+        OSMNode n1 = new OSMNode(1, 1.1, 2.2);
         op.putNode(n1);
-        OSMNode n2 = new OSMNode();
-        n2.setId(2);
-        n2.setLat(1.2);
-        n2.setLon(2.3);
+        OSMNode n2 = new OSMNode(2, 1.2, 2.3);
         op.putNode(n2);
-        OSMNode n3 = new OSMNode();
-        n3.setId(3);
-        n3.setLat(1.3);
-        n3.setLon(2.4);
+        OSMNode n3 = new OSMNode(3, 1.3, 2.4);
         op.putNode(n3);
-        OSMWay w1 = new OSMWay();
-        w1.setId(1);
+        OSMWay w1 = new OSMWay(1);
         w1.addRefToEnd(1);
         w1.addRefToEnd(2);
         w1.addRefToEnd(3);
         op.putWay(w1);
-        OSMWay w2 = new OSMWay();
-        w2.setId(2);
+        OSMWay w2 = new OSMWay(2);
         w2.addRefToEnd(1);
         w2.addRefToEnd(2);
         w2.addRefToEnd(3);
@@ -48,8 +50,7 @@ public class OsmParserTest
         
         assertTrue(op.samePathway(1, 2));
         
-        OSMWay w3 = new OSMWay();
-        w3.setId(3);
+        OSMWay w3 = new OSMWay(3);
         w3.addRefToEnd(3);
         w3.addRefToEnd(2);
         w3.addRefToEnd(1);
@@ -66,16 +67,13 @@ public class OsmParserTest
 	public void testMergeNodes()
 	{
 		OsmTestParser otp1 = new OsmTestParser();
-		OSMNode n = new OSMNode();
-		n.setId(23L);
+		OSMNode n = new OSMNode(23L, 1, 2);
 		n.setTag("node", "1");
 		otp1.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(42L);
+		n = new OSMNode(42L, 3, 4);
 		n.setTag("node", "2");
 		otp1.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(1337L);
+		n = new OSMNode(1337L, 5, 6);
 		n.setTag("node", "3");
 		otp1.nodes.put(n.getId(), n);
 		
@@ -85,16 +83,13 @@ public class OsmParserTest
 		assertTrue(otp1.getNodes().get(1337L).hasTag("node", "3"));
 		
 		OsmTestParser otp2 = new OsmTestParser();
-		n = new OSMNode();
-		n.setId(23L);
+		n = new OSMNode(23L, 1, 2);
 		n.setTag("node", "4");
 		otp2.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(42L);
+		n = new OSMNode(42L, 3, 4);
 		n.setTag("node", "5");
 		otp2.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(1337L);
+		n = new OSMNode(1337L, 5, 6);
 		n.setTag("node", "6");
 		otp2.nodes.put(n.getId(), n);
 		
@@ -103,7 +98,8 @@ public class OsmParserTest
 		assertTrue(otp2.getNodes().get(42L).hasTag("node", "5"));
 		assertTrue(otp2.getNodes().get(1337L).hasTag("node", "6"));
 		
-		otp1.mergeParsers(otp2, false);
+		ArrayList<String> merge_by_means_of = new ArrayList<>();
+		otp1.mergeParsers(otp2, false, merge_by_means_of);
 		
 		assertEquals(3, otp2.getNodes().size());
 		assertTrue(otp2.getNodes().containsKey(1338L));
@@ -137,36 +133,31 @@ public class OsmParserTest
 	@Test
 	public void mergeWays() {
 		OsmTestParser otp1 = new OsmTestParser();
-		OSMNode n = new OSMNode();
-		n.setId(23L);
+		OSMNode n = new OSMNode(23L, 1, 1);
 		n.setTag("node", "1");
 		otp1.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(42L);
+		n = new OSMNode(42L, 2, 2);
 		n.setTag("node", "2");
 		otp1.nodes.put(n.getId(), n);
-		OSMWay w = new OSMWay();
-		w.setId(1337L);
+		OSMWay w = new OSMWay(1337L);
 		w.addRefToEnd(23L);
 		w.addRefToEnd(42L);
 		otp1.ways.put(w.getId(), w);
 		
 		OsmTestParser otp2 = new OsmTestParser();
-		n = new OSMNode();
-		n.setId(23L);
+		n = new OSMNode(23L, 3, 3);
 		n.setTag("node", "3");
 		otp2.nodes.put(n.getId(), n);
-		n = new OSMNode();
-		n.setId(42L);
+		n = new OSMNode(42L, 4, 4);
 		n.setTag("node", "4");
 		otp2.nodes.put(n.getId(), n);
-		w = new OSMWay();
-		w.setId(1337L);
+		w = new OSMWay(1337L);
 		w.addRefToEnd(23L);
 		w.addRefToEnd(42L);
 		otp2.ways.put(w.getId(), w);
 		
-		otp1.mergeParsers(otp2, false);
+		ArrayList<String> merge_by_means_of = new ArrayList<>();
+		otp1.mergeParsers(otp2, false, merge_by_means_of);
 		
 		assertEquals(4, otp1.getNodes().size());
 		assertEquals(2, otp1.getWays().size());
@@ -185,31 +176,18 @@ public class OsmParserTest
 	{
 		OsmTestParser otp1 = new OsmTestParser();
 		OsmTestParser otp2 = new OsmTestParser();
-		OSMNode n11 = new OSMNode();
-		n11.setId(-1);
-		n11.setLat(1.0);
-		n11.setLon(1.0);
-		OSMNode n12 = new OSMNode();
-		n12.setId(-2);
-		n12.setLat(2.0);
-		n12.setLon(2.0);
+		OSMNode n11 = new OSMNode(-1L, 1.0, 1.0);
+		n11.setTag("node", "1");
+		OSMNode n12 = new OSMNode(-2L, 2.0, 2.0);
 		n12.setTag("entrance", "yes");
-		OSMNode n21 = new OSMNode();
-		n21.setId(-3);
-		n21.setLat(2.0);
-		n21.setLon(2.0);
+		OSMNode n21 = new OSMNode(-3L, 2.0, 2.0);
 		n21.setTag("entrance", "yes");
-		OSMNode n22 = new OSMNode();
-		n22.setId(-1);
-		n22.setLat(3.0);
-		n22.setLon(3.0);
+		OSMNode n22 = new OSMNode(-1L, 3.0, 3.0);
 		n22.setTag("node", "4");
-		OSMWay w1 = new OSMWay();
-		w1.setId(-1);
+		OSMWay w1 = new OSMWay(-1L);
 		w1.addRefToEnd(-1);
 		w1.addRefToEnd(-2);
-		OSMWay w2 = new OSMWay();
-		w2.setId(-2);
+		OSMWay w2 = new OSMWay(-2L);
 		w2.addRefToEnd(-3);
 		w2.addRefToEnd(-1);
 		otp1.nodes.put(n11.getId(), n11);
@@ -219,7 +197,9 @@ public class OsmParserTest
 		otp1.ways.put(w1.getId(), w1);
 		otp2.ways.put(w2.getId(), w2);
 
-		OsmParser otp3 = otp1.mergeParsers(otp2, true);
+		ArrayList<String> merge_by_means_of = new ArrayList<>();
+		merge_by_means_of.add("entrance");
+		OsmParser otp3 = otp1.mergeParsers(otp2, true, merge_by_means_of);
 		assertEquals(2, otp3.nodes.size());
 		assertTrue(otp3.nodes.containsKey(-3L));
 		assertTrue(otp3.nodes.get(-3L).hasTag("entrance", "yes"));
@@ -227,11 +207,11 @@ public class OsmParserTest
 		assertTrue(otp3.nodes.get(-4L).hasTag("node", "4"));
 		assertEquals(1, otp3.ways.size());
 		
-		assertEquals(4, otp1.nodes.size());
+		assertEquals(3, otp1.nodes.size());
 		assertEquals(2, otp1.ways.size());
 		assertTrue(otp1.ways.get(-1L).getRefs().contains(-1L));
 		assertTrue(otp1.ways.get(-1L).getRefs().contains(-2L));
-		assertTrue(otp1.ways.get(-2L).getRefs().contains(-3L));
+		assertTrue(otp1.ways.get(-2L).getRefs().contains(-2L));
 		assertTrue(otp1.ways.get(-2L).getRefs().contains(-4L));
 	}
 	
@@ -239,20 +219,14 @@ public class OsmParserTest
 	public void testReplaceNode()
 	{
 		OsmTestParser otp = new OsmTestParser();
-		OSMNode n1 = new OSMNode();
-		n1.setId(1L);
-		n1.setLat(2.0);
-		n1.setLon(3.0);
+		OSMNode n1 = new OSMNode(1L, 2.0, 3.0);
 		n1.setTag("node", "1");
 		otp.putNode(n1);
 		
 		assertTrue(otp.nodes.containsKey(1L));
 		assertEquals("1", otp.nodes.get(n1.getId()).getTag("node"));
 		
-		OSMNode n2 = new OSMNode();
-		n2.setId(2L);
-		n2.setLat(2.0);
-		n2.setLon(3.0);
+		OSMNode n2 = new OSMNode(2L, 2.0, 3.0);
 		n2.setTag("node", "2");
 		otp.replaceNode(n1.getId(), n2);
 		
@@ -265,20 +239,13 @@ public class OsmParserTest
 	public void testReplaceNodeInWay()
 	{
 		OsmTestParser otp = new OsmTestParser();
-		OSMNode n1 = new OSMNode();
-		n1.setId(1L);
-		n1.setLat(2.0);
-		n1.setLon(3.0);
+		OSMNode n1 = new OSMNode(1L, 2.0, 3.0);
 		n1.setTag("node", "1");
 		otp.putNode(n1);
-		OSMNode n2 = new OSMNode();
-		n2.setId(2L);
-		n2.setLat(4.0);
-		n2.setLon(5.0);
+		OSMNode n2 = new OSMNode(2L, 4.0, 5.0);
 		n2.setTag("node", "2");
 		otp.putNode(n2);
-		OSMWay w = new OSMWay();
-		w.setId(1L);
+		OSMWay w = new OSMWay(1L);
 		ArrayList<Long> refs = new ArrayList<>();
 		refs.add(n1.getId());
 		refs.add(n2.getId());
@@ -289,10 +256,7 @@ public class OsmParserTest
 		assertTrue(otp.nodes.containsKey(2L));
 		assertArrayEquals(new Long[]{1L, 2L}, otp.ways.get(1L).getRefs().toArray());
 		
-		OSMNode n3 = new OSMNode();
-		n3.setId(3L);
-		n3.setLat(4.0);
-		n3.setLon(5.0);
+		OSMNode n3 = new OSMNode(3L, 4.0, 5.0);
 		n3.setTag("node", "3");
 		otp.replaceNode(n2.getId(), n3);
 		
@@ -306,24 +270,17 @@ public class OsmParserTest
 	public void testReplaceNodeInRelation()
 	{
 		OsmTestParser otp = new OsmTestParser();
-		OSMNode n1 = new OSMNode();
-		n1.setId(1L);
-		n1.setLat(2.0);
-		n1.setLon(3.0);
+		OSMNode n1 = new OSMNode(1L, 2.0, 3.0);
 		n1.setTag("node", "1");
 		otp.putNode(n1);
-		OSMRelation r = new OSMRelation();
-		r.setId(1L);
+		OSMRelation r = new OSMRelation(1L, "");
 		r.addMember(n1, "node");
 		otp.putRelation(r);
 		
 		assertTrue(otp.nodes.containsKey(1L));
 		assertArrayEquals(new Long[]{1L}, otp.relations.get(1L).getMembersByElementType(OSMElement.NODE).keySet().toArray());
 		
-		OSMNode n2 = new OSMNode();
-		n2.setId(2L);
-		n2.setLat(2.0);
-		n2.setLon(3.0);
+		OSMNode n2 = new OSMNode(2L, 2.0, 3.0);
 		n2.setTag("node", "2");
 		otp.replaceNode(n1.getId(), n2);
 		

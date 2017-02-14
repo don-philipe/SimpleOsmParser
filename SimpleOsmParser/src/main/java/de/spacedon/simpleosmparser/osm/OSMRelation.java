@@ -15,20 +15,13 @@ public class OSMRelation extends OSMElement
     private HashMap<Long, String> relation_members;
     
     /**
-     * Just calls OSMRelation("").
-     */
-    public OSMRelation()
-    {
-        this("");
-    }
-    
-    /**
      * 
+	 * @param id
      * @param relationtype the type of this relation
      */
-    public OSMRelation(String relationtype)
+    public OSMRelation(long id, String relationtype)
     {
-        super(OSMElement.RELATION);
+        super(id, OSMElement.RELATION);
         this.type = relationtype;
         this.node_members = new HashMap<>();
         this.way_members = new HashMap<>();

@@ -79,10 +79,7 @@ public class SinkImpl implements Sink
     
     private void processNode(Node node)
     {
-        OSMNode n = new OSMNode();
-        n.setId(node.getId());
-        n.setLat(node.getLatitude());
-        n.setLon(node.getLongitude());
+        OSMNode n = new OSMNode(node.getId(), node.getLatitude(), node.getLongitude());
         n.setTimestamp(node.getTimestamp());
         n.setVersion(node.getVersion());
         for(Tag t : node.getTags())
@@ -93,8 +90,7 @@ public class SinkImpl implements Sink
     
     private void processWay(Way way)
     {
-        OSMWay w = new OSMWay();
-        w.setId(way.getId());
+        OSMWay w = new OSMWay(way.getId());
         w.setTimestamp(way.getTimestamp());
         w.setVersion(way.getVersion());
         int i = 1;
@@ -111,8 +107,7 @@ public class SinkImpl implements Sink
     
     private void processRelation(Relation relation)
     {
-        OSMRelation r = new OSMRelation();
-        r.setId(relation.getId());
+        OSMRelation r = new OSMRelation(relation.getId(), "");
         r.setTimestamp(relation.getTimestamp());
         r.setVersion(relation.getVersion());
         for(RelationMember m : relation.getMembers())

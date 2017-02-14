@@ -3,6 +3,7 @@ package de.spacedon.simpleosmparser.parser;
 import de.spacedon.simpleosmparser.osm.OSMNode;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.xml.stream.XMLStreamException;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -37,18 +38,17 @@ public class OsmFileParserTest
     public void testSameIdOnMerge()
     {
         OsmFileParser sop1 = new OsmFileParser();
-        OSMNode n1 = new OSMNode();
-        n1.setId(1);
+        OSMNode n1 = new OSMNode(1, 1.0, 1.0);
         sop1.putNode(n1);
         
         OsmFileParser sop2 = new OsmFileParser();
-        OSMNode n2 = new OSMNode();
-        n2.setId(1);
+        OSMNode n2 = new OSMNode(1, 2.0, 2.0);
         sop2.putNode(n2);
         
         assertTrue(sop1.getNodes().size() == 1);
         
-        OsmParser sop3 = sop1.mergeParsers(sop2, false);
+		ArrayList<String> merge_by_means_of = new ArrayList<>();
+        OsmParser sop3 = sop1.mergeParsers(sop2, false, merge_by_means_of);
         
         assertTrue(sop1.getNodes().size() == 2);
         assertTrue(sop1.getNode(1).getId() == 1);

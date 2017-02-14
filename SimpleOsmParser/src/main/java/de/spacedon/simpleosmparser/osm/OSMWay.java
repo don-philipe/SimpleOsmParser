@@ -8,9 +8,9 @@ public class OSMWay extends OSMElement
     private String action;
     private ArrayList<Long> refs;
     
-    public OSMWay()
+    public OSMWay(long id)
     {
-        super(OSMElement.WAY);
+        super(id, OSMElement.WAY);
         this.refs = new ArrayList<>();
     }
     

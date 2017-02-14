@@ -27,8 +27,9 @@ public abstract class OSMElement
     private String user;
     private long uid;
     
-    public OSMElement(int elementtype)
+    public OSMElement(long id, int elementtype)
     {
+		this.id = id;
         this.elementtype = elementtype;
         this.tags = new HashMap<>();
     }

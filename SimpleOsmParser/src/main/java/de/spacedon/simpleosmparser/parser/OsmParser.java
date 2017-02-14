@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -30,15 +31,18 @@ public abstract class OsmParser
     }
     
     /**
-     * Merges the overhandes parser (osm files) into this. Especially takes care of IDs.
+     * Merges the overhandes parser (osm files) into this. Especially takes care of IDs
+	 * and can merge double nodes (regarding position).
      * @param parser 
      * @param negative_ids allow negative IDs?
+	 * @param nodetags_to_merge merge nodes at same position with same values for these keys, can be left empty
      * @return the parser that was overhanded to this method, because its IDs might have changed.
      */
-    public OsmParser mergeParsers(OsmParser parser, boolean negative_ids)
+    public OsmParser mergeParsers(OsmParser parser, boolean negative_ids, List<String> nodetags_to_merge)
     {        
         ArrayList<Long> remove_nodes = new ArrayList<>();
         ArrayList<OSMNode> new_nodes = new ArrayList<>();
+		HashMap<Long, Long> merge_nodes = new HashMap<>();	// key -> this node, value -> parser node
 		long min_id = 0L;
 		long max_id = 0L;
 		if(!this.nodes.isEmpty() && !parser.nodes.isEmpty())
@@ -64,6 +68,33 @@ public abstract class OsmParser
         for(OSMNode n : new_nodes)
             parser.putNode(n);
         this.nodes.putAll(parser.getNodes());
+		
+		for(Long id : parser.getNodes().keySet())
+		{
+			if(nodetags_to_merge != null && !nodetags_to_merge.isEmpty())
+			{
+				long same_node = this.sameNode(parser.getNode(id).getLat(), parser.getNode(id).getLon(), 0);
+				if(same_node != 0)
+				{
+					boolean merge = true;
+					for(String key : nodetags_to_merge)
+					{
+						String thisvalue = this.nodes.get(same_node).getTag(key);
+						String parservalue = parser.getNode(id).getTag(key);
+						if(thisvalue == null || parservalue == null || !thisvalue.equals(parservalue))
+						{
+							merge = false;
+							break;
+						}
+					}
+					
+					if(merge)
+					{
+						merge_nodes.put(same_node, id);
+					}
+				}
+			}
+		}
         
         // refresh refs in all ways:
         for(OSMWay w : parser.getWays().values())
@@ -78,6 +109,19 @@ public abstract class OsmParser
 				}
             }
         }
+		for(Long this_n_id : merge_nodes.keySet())
+		{
+			long parser_n_id = merge_nodes.get(this_n_id);
+			this.nodes.remove(parser_n_id);
+			for(OSMWay w : parser.getWays().values())
+			{
+				if(w.getRefs().contains(parser_n_id))
+				{
+					w.replaceRef(parser_n_id, this_n_id);
+				}
+			}
+		}
+		
         //TODO refresh refs in all relations
         
         ArrayList<Long> remove_ways = new ArrayList<>();
@@ -169,8 +213,8 @@ public abstract class OsmParser
     {
        for(OSMNode node : this.nodes.values())
        {
-           if(lat - tolerance < node.getLat() && node.getLat() < lat + tolerance
-                   && lon - tolerance < node.getLon() && node.getLon() < lon + tolerance)
+           if(lat - tolerance <= node.getLat() && node.getLat() <= lat + tolerance
+                   && lon - tolerance <= node.getLon() && node.getLon() <= lon + tolerance)
                return node.getId();
        }
        return 0;

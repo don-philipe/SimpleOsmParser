@@ -253,26 +253,22 @@ public class OsmFileParser extends OsmParser
      */
     private OSMNode readNode() throws XMLStreamException
     {
-        OSMNode n = new OSMNode();
-        
+        OSMNode n = null;
+        String id = reader.getAttributeValue(null, "id");
         String lat = reader.getAttributeValue(null, "lat");
         String lon = reader.getAttributeValue(null, "lon");
-        if(lat != null && lon != null)
+        if(id != null && lat != null && lon != null)
         {
-            n.setLat(Double.valueOf(lat));
-            n.setLon(Double.valueOf(lon));
+			n = new OSMNode(Long.valueOf(id), Double.valueOf(lat), Double.valueOf(lon));
         }
-        String id = reader.getAttributeValue(null, "id");
-        if(id != null)
-            n.setId(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
-        if(version != null)
+        if(n != null && version != null)
             n.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(visible != null)
+        if(n != null && visible != null)
             n.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(user != null)
+        if(n != null && user != null)
             n.setUser(user);
         
         while(true)
@@ -297,19 +293,19 @@ public class OsmFileParser extends OsmParser
      */
     private OSMWay readWay() throws XMLStreamException
     {
-        OSMWay w = new OSMWay();
+        OSMWay w = null;
         
         String id = reader.getAttributeValue(null, "id");
         if(id != null)
-            w.setId(Long.valueOf(id));
+            w = new OSMWay(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
-        if(version != null)
+        if(w != null && version != null)
             w.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(visible != null)
+        if(w != null && visible != null)
             w.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(user != null)
+        if(w != null && user != null)
             w.setUser(user);
         
         while(true)
@@ -321,7 +317,7 @@ public class OsmFileParser extends OsmParser
                 {
                 case "nd":
                     String ref = reader.getAttributeValue(null, "ref");
-                    if(ref != null)
+                    if(w != null && ref != null)
                     {
                         w.addRefToEnd(Long.valueOf(ref));
                         // add a reverse link (inverse to "ref") to the nodes of
@@ -349,25 +345,25 @@ public class OsmFileParser extends OsmParser
      */
     private OSMRelation readRelation() throws XMLStreamException
     {
-        OSMRelation r = new OSMRelation();
+        OSMRelation r = null;
         
         String id = reader.getAttributeValue(null, "id");
         if(id != null)
-            r.setId(Long.valueOf(id));
+            r = new OSMRelation(Long.valueOf(id), "");
         String version = reader.getAttributeValue(null, "version");
-        if(version != null)
+        if(r != null && version != null)
             r.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(visible != null)
+        if(r != null && visible != null)
             r.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(user != null)
+        if(r != null && user != null)
             r.setUser(user);
         
         while(true)
         {
             int event = reader.next();
-            if(event == XMLStreamConstants.START_ELEMENT)
+            if(r != null && event == XMLStreamConstants.START_ELEMENT)
             {
                 switch(reader.getLocalName())
                 {
