@@ -33,13 +33,17 @@ public abstract class OsmParser
     /**
      * Merges the overhandes parser (osm files) into this. Especially takes care of IDs
 	 * and can merge double nodes (regarding position).
-     * @param parser 
+     * @param parser the osm elements of this osmparser might change if several 
+	 * IDs are doublings of IDs of this osmparser.
      * @param negative_ids allow negative IDs?
 	 * @param nodetags_to_merge merge nodes at same position with same values for these keys, can be left empty
-     * @return the parser that was overhanded to this method, because its IDs might have changed.
+     * @return a map containing maps for every osm element type that was changed
+	 * (see OSMELement.NODE, OSMElement.WAY, OSMElement.RELATION). The inner maps
+	 * containing the old IDs as keys and the new IDs as values.
      */
-    public OsmParser mergeParsers(OsmParser parser, boolean negative_ids, List<String> nodetags_to_merge)
-    {        
+    public HashMap<Integer, HashMap<Long, Long>> mergeParsers(OsmParser parser, boolean negative_ids, List<String> nodetags_to_merge)
+    {
+		HashMap<Integer, HashMap<Long, Long>> changed_ids = new HashMap<>();
         ArrayList<Long> remove_nodes = new ArrayList<>();
         ArrayList<OSMNode> new_nodes = new ArrayList<>();
 		HashMap<Long, Long> merge_nodes = new HashMap<>();	// key -> this node, value -> parser node
@@ -50,6 +54,7 @@ public abstract class OsmParser
 			min_id = Math.min(Collections.min(this.nodes.keySet()), Collections.min(parser.nodes.keySet()));
 			max_id = Math.max(Collections.max(this.nodes.keySet()), Collections.max(parser.nodes.keySet()));
 		}
+		changed_ids.put(OSMElement.NODE, new HashMap<Long, Long>());
         for(Long id : parser.getNodes().keySet())
         {
             if(this.nodes.containsKey(id))
@@ -61,6 +66,7 @@ public abstract class OsmParser
                 else
                     n.setId(++max_id);
                 new_nodes.add(n);
+				changed_ids.get(OSMElement.NODE).put(id, n.getId());
             }
         }
         for(Long id : remove_nodes)
@@ -133,6 +139,7 @@ public abstract class OsmParser
 			min_id = Math.min(Collections.min(this.ways.keySet()), Collections.min(parser.ways.keySet()));
 			max_id = Math.max(Collections.max(this.ways.keySet()), Collections.max(parser.ways.keySet()));
 		}
+		changed_ids.put(OSMElement.WAY, new HashMap<Long, Long>());
         for(Long id : parser.getWays().keySet())
         {
             if(this.ways.containsKey(id))
@@ -144,6 +151,7 @@ public abstract class OsmParser
                 else
                     w.setId(++max_id);
                 new_ways.add(w);
+				changed_ids.get(OSMElement.WAY).put(id, w.getId());
             }
         }
         for(Long id : remove_ways)
@@ -162,6 +170,7 @@ public abstract class OsmParser
 			min_id = Math.min(Collections.min(this.relations.keySet()), Collections.min(parser.relations.keySet()));
 			max_id = Math.max(Collections.max(this.relations.keySet()), Collections.max(parser.relations.keySet()));
 		}
+		changed_ids.put(OSMElement.RELATION, new HashMap<Long, Long>());
         for(Long id : parser.getRelations().keySet())
         {
             if(this.relations.containsKey(id))
@@ -173,6 +182,7 @@ public abstract class OsmParser
                 else
                     r.setId(++max_id);
                 new_relations.add(r);
+				changed_ids.get(OSMElement.RELATION).put(id, r.getId());
             }
         }
         for(Long id : remove_relations)
@@ -181,7 +191,7 @@ public abstract class OsmParser
             parser.putRelation(r);
         this.relations.putAll(parser.getRelations());
         
-        return parser;
+        return changed_ids;
     }
     
     /**

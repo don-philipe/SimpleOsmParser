@@ -199,13 +199,13 @@ public class OsmParserTest
 
 		ArrayList<String> merge_by_means_of = new ArrayList<>();
 		merge_by_means_of.add("entrance");
-		OsmParser otp3 = otp1.mergeParsers(otp2, true, merge_by_means_of);
-		assertEquals(2, otp3.nodes.size());
-		assertTrue(otp3.nodes.containsKey(-3L));
-		assertTrue(otp3.nodes.get(-3L).hasTag("entrance", "yes"));
-		assertTrue(otp3.nodes.containsKey(-4L));
-		assertTrue(otp3.nodes.get(-4L).hasTag("node", "4"));
-		assertEquals(1, otp3.ways.size());
+		otp1.mergeParsers(otp2, true, merge_by_means_of);
+		assertEquals(2, otp2.nodes.size());
+		assertTrue(otp2.nodes.containsKey(-3L));
+		assertTrue(otp2.nodes.get(-3L).hasTag("entrance", "yes"));
+		assertTrue(otp2.nodes.containsKey(-4L));
+		assertTrue(otp2.nodes.get(-4L).hasTag("node", "4"));
+		assertEquals(1, otp2.ways.size());
 		
 		assertEquals(3, otp1.nodes.size());
 		assertEquals(2, otp1.ways.size());
