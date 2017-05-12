@@ -10,9 +10,9 @@ public class OSMNode extends OSMElement
     
     public OSMNode(long id, double lat, double lon)
     {
-		super(id, OSMElement.NODE);
-		this.lat = lat;
-		this.lon = lon;
+        super(id, OSMElement.NODE);
+        this.lat = lat;
+        this.lon = lon;
     }
     
     /**
