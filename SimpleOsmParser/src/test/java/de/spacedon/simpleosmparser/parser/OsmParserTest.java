@@ -233,8 +233,8 @@ public class OsmParserTest {
         n2.setTag("node", "2");
         otp.replaceNode(n1.getId(), n2);
 
-        assertFalse(otp.nodes.containsKey(1L));
-        assertTrue(otp.nodes.containsKey(2L));
+        assertFalse(otp.nodes.containsKey(n1.getId()));
+        assertTrue(otp.nodes.containsKey(n2.getId()));
         assertEquals("2", otp.nodes.get(n2.getId()).getTag("node"));
     }
 
