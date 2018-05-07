@@ -47,4 +47,13 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
+    
+    <profiles>
+	<profile>
+	    <id>run_w/o_tests</id>
+	    <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+	</profile>
+    </profiles>
 </project>
