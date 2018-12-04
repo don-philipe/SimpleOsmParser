@@ -4,6 +4,7 @@ import de.spacedon.simpleosmparser.osm.OSMElement;
 import de.spacedon.simpleosmparser.osm.OSMNode;
 import de.spacedon.simpleosmparser.osm.OSMRelation;
 import de.spacedon.simpleosmparser.osm.OSMWay;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,84 +27,73 @@ import javax.xml.stream.XMLStreamWriter;
 
 /**
  * Reads and writes *.osm files (XML format).
+ *
  * @author Philipp Thöricht
  */
-public class OsmFileParser extends OsmParser
-{
+public class OsmFileParser extends OsmParser {
     private XMLStreamReader reader;
-    
-    public OsmFileParser()
-    {
-        
+
+    public OsmFileParser() {
+
     }
 
     /**
-     * 
      * @param file
-     * @return
+     * @return number of errors while reading
      * @throws IOException
      * @throws XMLStreamException
-     * @throws FactoryConfigurationError 
+     * @throws FactoryConfigurationError
      */
-    public int parseOsmFile(File file) throws IOException, XMLStreamException, FactoryConfigurationError
-    {
+    public long parseOsmFile(File file) throws IOException, XMLStreamException, FactoryConfigurationError {
+        long numErrors = 0;
         InputStream in = new FileInputStream(file);
-        try
-        {
+        try {
             reader = XMLInputFactory.newInstance().createXMLStreamReader(in);
             int event = reader.getEventType();
-            while(true)
-            {
-                if(event == XMLStreamConstants.START_ELEMENT)
-                {
-                    if("osm".equals(reader.getLocalName()))
-                        readOsm();
-                    else
+            while (true) {
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    if ("osm".equals(reader.getLocalName())) {
+                        numErrors = readOsm();
+                    } else {
                         jumpToEnd();
-                }
-                else if(event == XMLStreamConstants.END_ELEMENT)
-                    return 0;
-                
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT)
+                    return numErrors;
+
                 if (reader.hasNext())
                     event = reader.next();
                 else
                     break;
-             }
+            }
             reader.close();
-        }
-        finally
-        {
+        } finally {
             in.close();
         }
-        return 0;
+        return numErrors;
     }
-    
+
     /**
-     * 
      * @param file
-     * @throws javax.xml.stream.XMLStreamException 
+     * @throws javax.xml.stream.XMLStreamException
      */
-    public void writeOsmFile(File file) throws XMLStreamException
-    {
+    public void writeOsmFile(File file) throws XMLStreamException {
         XMLStreamWriter writer;
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String timestamp = sdf.format(cal.getTime());
-        try
-        {
+        try {
             OutputStream out = new FileOutputStream(file);
             writer = XMLOutputFactory.newInstance().createXMLStreamWriter(out);
             writer.writeStartDocument();
-            
+
             writer.writeStartElement("osm");
             writer.writeAttribute("version", "0.6");
             writer.writeAttribute("upload", "false");
             writer.writeAttribute("generator", "CN");
-            for(OSMNode n : this.nodes.values())
-            {
+            for (OSMNode n : this.nodes.values()) {
                 writer.writeStartElement("node");
                 writer.writeAttribute("id", String.valueOf(n.getId()));
-                if(n.getTimestamp() != null)
+                if (n.getTimestamp() != null)
                     writer.writeAttribute("timestamp", sdf.format(n.getTimestamp()));
                 else
                     writer.writeAttribute("timestamp", timestamp);
@@ -114,17 +104,15 @@ public class OsmFileParser extends OsmParser
                 writer.writeEndElement();
                 writer.writeCharacters(System.getProperty("line.separator"));
             }
-            for(OSMWay w : this.ways.values())
-            {
+            for (OSMWay w : this.ways.values()) {
                 writer.writeStartElement("way");
                 writer.writeAttribute("id", String.valueOf(w.getId()));
-                if(w.getTimestamp() != null)
+                if (w.getTimestamp() != null)
                     writer.writeAttribute("timestamp", sdf.format(w.getTimestamp()));
                 else
                     writer.writeAttribute("timestamp", timestamp);
                 writer.writeAttribute("version", String.valueOf(w.getVersion()));
-                for(long nid : w.getRefs())
-                {
+                for (long nid : w.getRefs()) {
                     writer.writeEmptyElement("nd");
                     writer.writeAttribute("ref", String.valueOf(nid));
                 }
@@ -132,23 +120,19 @@ public class OsmFileParser extends OsmParser
                 writer.writeEndElement();
                 writer.writeCharacters(System.getProperty("line.separator"));
             }
-            for(OSMRelation r : this.relations.values())
-            {
+            for (OSMRelation r : this.relations.values()) {
                 writer.writeStartElement("relation");
                 writer.writeAttribute("id", String.valueOf(r.getId()));
-                if(r.getTimestamp() != null)
+                if (r.getTimestamp() != null)
                     writer.writeAttribute("timestamp", sdf.format(r.getTimestamp()));
                 else
                     writer.writeAttribute("timestamp", timestamp);
                 writer.writeAttribute("version", String.valueOf(r.getVersion()));
-                for(int i = 0; i < r.getAllMembers().size(); i++)
-                {
+                for (int i = 0; i < r.getAllMembers().size(); i++) {
                     HashMap<Long, String> element_map = r.getAllMembers().get(i);
-                    for(Long id : element_map.keySet())
-                    {
+                    for (Long id : element_map.keySet()) {
                         writer.writeEmptyElement("member");
-                        switch(i)
-                        {
+                        switch (i) {
                             case 0:
                                 writer.writeAttribute("type", "node");
                                 break;
@@ -169,30 +153,24 @@ public class OsmFileParser extends OsmParser
             }
             writer.writeEndElement();
             writer.writeCharacters(System.getProperty("line.separator"));
-            
+
             writer.flush();
             writer.close();
-			out.close();
-        }
-        catch (FileNotFoundException ex)
-        {
+            out.close();
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(SimpleOsmParser.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex)
-		{
-			Logger.getLogger(OsmFileParser.class.getName()).log(Level.SEVERE, null, ex);
-		}
+        } catch (IOException ex) {
+            Logger.getLogger(OsmFileParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     /**
-     * 
      * @param writer
      * @param ele
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private void writeTags(XMLStreamWriter writer, OSMElement ele) throws XMLStreamException
-    {
-        for(String key : ele.getTags().keySet())
-        {
+    private void writeTags(XMLStreamWriter writer, OSMElement ele) throws XMLStreamException {
+        for (String key : ele.getTags().keySet()) {
             writer.writeEmptyElement("tag");
             writer.writeAttribute("k", key);
             writer.writeAttribute("v", ele.getTag(key));
@@ -200,38 +178,47 @@ public class OsmFileParser extends OsmParser
     }
 
     /**
-     * 
+     * @return number of errors while reading
      */
-    private void readOsm() throws XMLStreamException
-    {
+    private long readOsm() throws XMLStreamException {
         String version = reader.getAttributeValue(null, "version");
-        if(version != null)
+        if (version != null)
             ;
         String upload = reader.getAttributeValue(null, "upload");
-        if(upload != null)
+        if (upload != null)
             ;
         String generator = reader.getAttributeValue(null, "generator");
-        
-        while (true)
-        {
+
+        long numErrors = 0;
+        while (true) {
             int event = reader.next();
-            if (event == XMLStreamConstants.START_ELEMENT)
-            {
-                switch (reader.getLocalName())
-                {
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                switch (reader.getLocalName()) {
 //                    case "bounds":
 //                        readBounds(generator);
 //                        break;
                     case "node":
                         OSMNode n = readNode();
+                        if (n == null) {
+                            numErrors++;
+                            continue;
+                        }
                         this.nodes.put(n.getId(), n);
                         break;
                     case "way":
                         OSMWay w = readWay();
+                        if (w == null) {
+                            numErrors++;
+                            continue;
+                        }
                         this.ways.put(w.getId(), w);
                         break;
                     case "relation":
                         OSMRelation r = readRelation();
+                        if (r == null) {
+                            numErrors++;
+                            continue;
+                        }
                         this.relations.put(r.getId(), r);
                         break;
 //                    case "changeset":
@@ -240,183 +227,160 @@ public class OsmFileParser extends OsmParser
                     default:
                         jumpToEnd();
                 }
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                return numErrors;
             }
-            else if (event == XMLStreamConstants.END_ELEMENT)
-                return;
         }
     }
-    
+
     /**
-     * 
      * @return
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private OSMNode readNode() throws XMLStreamException
-    {
+    private OSMNode readNode() throws XMLStreamException {
         OSMNode n = null;
         String id = reader.getAttributeValue(null, "id");
         String lat = reader.getAttributeValue(null, "lat");
         String lon = reader.getAttributeValue(null, "lon");
-        if(id != null && lat != null && lon != null)
-        {
-			n = new OSMNode(Long.valueOf(id), Double.valueOf(lat), Double.valueOf(lon));
+        if (id != null && lat != null && lon != null) {
+            n = new OSMNode(Long.valueOf(id), Double.valueOf(lat), Double.valueOf(lon));
         }
         String version = reader.getAttributeValue(null, "version");
-        if(n != null && version != null)
+        if (n != null && version != null)
             n.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(n != null && visible != null)
+        if (n != null && visible != null)
             n.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(n != null && user != null)
+        if (n != null && user != null)
             n.setUser(user);
-        
-        while(true)
-        {
+
+        while (true) {
             int event = reader.next();
-            if (event == XMLStreamConstants.START_ELEMENT)
-            {
-                if("tag".equals(reader.getLocalName()))
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                if ("tag".equals(reader.getLocalName()))
                     n.setTag(readTag());
                 else
                     jumpToEnd();
-            }
-            else if(event == XMLStreamConstants.END_ELEMENT)
+            } else if (event == XMLStreamConstants.END_ELEMENT)
                 return n;
         }
     }
-    
+
     /**
-     * 
      * @return
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private OSMWay readWay() throws XMLStreamException
-    {
+    private OSMWay readWay() throws XMLStreamException {
         OSMWay w = null;
-        
+
         String id = reader.getAttributeValue(null, "id");
-        if(id != null)
+        if (id != null)
             w = new OSMWay(Long.valueOf(id));
         String version = reader.getAttributeValue(null, "version");
-        if(w != null && version != null)
+        if (w != null && version != null)
             w.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(w != null && visible != null)
+        if (w != null && visible != null)
             w.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(w != null && user != null)
+        if (w != null && user != null)
             w.setUser(user);
-        
-        while(true)
-        {
+
+        while (true) {
             int event = reader.next();
-            if (event == XMLStreamConstants.START_ELEMENT)
-            {
-                switch(reader.getLocalName())
-                {
-                case "nd":
-                    String ref = reader.getAttributeValue(null, "ref");
-                    if(w != null && ref != null)
-                    {
-                        w.addRefToEnd(Long.valueOf(ref));
-                        // add a reverse link (inverse to "ref") to the nodes of
-                        // this way
-                        this.nodes.get(Long.valueOf(ref)).addBelongsTo(w);
-                    }
-                    jumpToEnd();
-                    break;
-                case "tag":
-                    w.setTag(readTag());
-                    break;
-                default:
-                    jumpToEnd();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                switch (reader.getLocalName()) {
+                    case "nd":
+                        String ref = reader.getAttributeValue(null, "ref");
+                        if (w != null && ref != null) {
+                            w.addRefToEnd(Long.valueOf(ref));
+                            // add a reverse link (inverse to "ref") to the nodes of
+                            // this way
+                            this.nodes.get(Long.valueOf(ref)).addBelongsTo(w);
+                        }
+                        jumpToEnd();
+                        break;
+                    case "tag":
+                        w.setTag(readTag());
+                        break;
+                    default:
+                        jumpToEnd();
                 }
-            }
-            else if(event == XMLStreamConstants.END_ELEMENT)
+            } else if (event == XMLStreamConstants.END_ELEMENT)
                 return w;
         }
     }
-    
+
     /**
-     * 
      * @return
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private OSMRelation readRelation() throws XMLStreamException
-    {
+    private OSMRelation readRelation() throws XMLStreamException {
         OSMRelation r = null;
-        
+
         String id = reader.getAttributeValue(null, "id");
-        if(id != null)
+        if (id != null)
             r = new OSMRelation(Long.valueOf(id), "");
         String version = reader.getAttributeValue(null, "version");
-        if(r != null && version != null)
+        if (r != null && version != null)
             r.setVersion(Integer.valueOf(version));
         String visible = reader.getAttributeValue(null, "visible");
-        if(r != null && visible != null)
+        if (r != null && visible != null)
             r.setVisible(Boolean.valueOf(visible));
         String user = reader.getAttributeValue(null, "user");
-        if(r != null && user != null)
+        if (r != null && user != null)
             r.setUser(user);
-        
-        while(true)
-        {
+
+        while (true) {
             int event = reader.next();
-            if(r != null && event == XMLStreamConstants.START_ELEMENT)
-            {
-                switch(reader.getLocalName())
-                {
-                case "member":
-                    String type = reader.getAttributeValue(null, "type");
-                    String ref = reader.getAttributeValue(null, "ref");
-                    String role = reader.getAttributeValue(null, "role");
-                    if(type != null && ref != null && role != null)
-                    {
-                        // add a reverse link (inverse to "member" attribute) to
-                        // the members of this relation
-                        switch (type)
-                        {
-                            case "node":
-								r.addMember(OSMElement.NODE, Long.valueOf(ref), role);
-								if(Long.valueOf(ref) != null && this.nodes.containsKey(Long.valueOf(ref)))
-									this.nodes.get(Long.valueOf(ref)).addBelongsTo(r);
-                                break;
-                            case "way":
-								r.addMember(OSMElement.WAY, Long.valueOf(ref), role);
-								if(Long.valueOf(ref) != null && this.ways.containsKey(Long.valueOf(ref)))
-									this.ways.get(Long.valueOf(ref)).addBelongsTo(r);
-                                break;
-                            case "relation":
-								r.addMember(OSMElement.RELATION, Long.valueOf(ref), role);
-								if(Long.valueOf(ref) != null && this.relations.containsKey(Long.valueOf(ref)))
-									this.relations.get(Long.valueOf(ref)).addBelongsTo(r);
-                                break;
-                            default:
-                                break;
+            if (r != null && event == XMLStreamConstants.START_ELEMENT) {
+                switch (reader.getLocalName()) {
+                    case "member":
+                        String type = reader.getAttributeValue(null, "type");
+                        String ref = reader.getAttributeValue(null, "ref");
+                        String role = reader.getAttributeValue(null, "role");
+                        if (type != null && ref != null && role != null) {
+                            // add a reverse link (inverse to "member" attribute) to
+                            // the members of this relation
+                            switch (type) {
+                                case "node":
+                                    r.addMember(OSMElement.NODE, Long.valueOf(ref), role);
+                                    if (Long.valueOf(ref) != null && this.nodes.containsKey(Long.valueOf(ref)))
+                                        this.nodes.get(Long.valueOf(ref)).addBelongsTo(r);
+                                    break;
+                                case "way":
+                                    r.addMember(OSMElement.WAY, Long.valueOf(ref), role);
+                                    if (Long.valueOf(ref) != null && this.ways.containsKey(Long.valueOf(ref)))
+                                        this.ways.get(Long.valueOf(ref)).addBelongsTo(r);
+                                    break;
+                                case "relation":
+                                    r.addMember(OSMElement.RELATION, Long.valueOf(ref), role);
+                                    if (Long.valueOf(ref) != null && this.relations.containsKey(Long.valueOf(ref)))
+                                        this.relations.get(Long.valueOf(ref)).addBelongsTo(r);
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    }
-                    jumpToEnd();
-                    break;
-                case "tag":
-                    r.setTag(readTag());
-                    break;
-                default:
-                    jumpToEnd();
+                        jumpToEnd();
+                        break;
+                    case "tag":
+                        r.setTag(readTag());
+                        break;
+                    default:
+                        jumpToEnd();
                 }
-            }
-            else if(event == XMLStreamConstants.END_ELEMENT)
+            } else if (event == XMLStreamConstants.END_ELEMENT)
                 return r;
         }
     }
-    
+
     /**
-     * 
      * @return
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private HashMap<String, String> readTag() throws XMLStreamException
-    {
+    private HashMap<String, String> readTag() throws XMLStreamException {
         HashMap<String, String> hm = new HashMap<>();
         String key = reader.getAttributeValue(null, "k");
         String value = reader.getAttributeValue(null, "v");
@@ -427,15 +391,12 @@ public class OsmFileParser extends OsmParser
         jumpToEnd();
         return hm;
     }
-    
+
     /**
-     * 
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
-    private void jumpToEnd() throws XMLStreamException
-    {
-        while(true)
-        {
+    private void jumpToEnd() throws XMLStreamException {
+        while (true) {
             int event = reader.next();
             if (event == XMLStreamConstants.START_ELEMENT)
                 jumpToEnd();
